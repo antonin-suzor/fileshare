@@ -1,16 +1,15 @@
 <script lang="ts">
     import { pushState } from '$app/navigation';
     import { page } from '$app/state';
-    import { axiosInstance } from '$lib/api/axios';
+    import { lazyGetUserUploads, lazyRefreshUserUploads, lazySetUserUploads } from '$lib/api/uploads.svelte';
     import UploadCard from '$lib/components/UploadCard.svelte';
     import type { Upload } from '$lib/types';
     import { onMount } from 'svelte';
 
-    let uploads: Upload[] = $state([]);
     let searchQuery: string = $state('');
 
     function removeUpload(upload: Upload) {
-        uploads = uploads.filter((u) => u.id !== upload.id);
+        lazySetUserUploads(lazyGetUserUploads().filter((u) => u.id !== upload.id));
     }
 
     function handleSearch() {
@@ -23,14 +22,14 @@
 
     function filteredUploads(): Upload[] {
         if (!searchQuery.trim()) {
-            return uploads;
+            return lazyGetUserUploads();
         }
         const query = searchQuery.toLowerCase();
-        return uploads.filter((upload) => upload.file_name.toLowerCase().includes(query));
+        return lazyGetUserUploads().filter((upload) => upload.file_name.toLowerCase().includes(query));
     }
 
-    onMount(async () => {
-        uploads = (await axiosInstance.get('/api/uploads/mine')).data;
+    onMount(() => {
+        lazyRefreshUserUploads();
         searchQuery = page.url.searchParams.get('search') ?? '';
     });
 </script>

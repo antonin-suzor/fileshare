@@ -8,7 +8,7 @@
     let { upload, onDelete }: { upload: Upload; onDelete: (upload: Upload) => void } = $props();
 
     async function getUploadText(): Promise<string> {
-        const res = await fetch(upload.presigned_get);
+        const res = await fetch(`/content/${upload.id}/${upload.file_name}`);
         const resText = await res.text();
         const resTextLength = resText.length;
         if (resTextLength >= textDisplaySizeLimit) {
@@ -25,8 +25,8 @@
             .catch(() => alert('Hmm, something went wrong... Did you give us access to your clipboard ?'));
     }
 
-    function deleteUpload() {
-        axiosInstance.delete(`/api/uploads/${upload.id}`);
+    async function deleteUpload() {
+        await axiosInstance.delete(`/api/uploads/${upload.id}`);
         onDelete(upload);
     }
 </script>
@@ -34,7 +34,11 @@
 <div class="card w-96 bg-base-100 shadow-sm">
     <figure>
         {#if upload.content_type.startsWith('image')}
-            <img src={upload.presigned_get} alt={`preview for ${upload.file_name}`} style="object-fit: scale-down;" />
+            <img
+                src={`/content/${upload.id}/${upload.file_name}`}
+                alt={`preview for ${upload.file_name}`}
+                style="object-fit: scale-down;"
+            />
         {:else if upload.content_type.startsWith('text')}
             {#await getUploadText()}
                 <p>Text-based file</p>

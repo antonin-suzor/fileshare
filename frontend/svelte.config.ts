@@ -1,19 +1,16 @@
-/*
-DO NOT RENAME TO TS, OR CLOUDFLARE PAGES WILL CRASH ON BUILD
-*/
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
+import { Config } from '@sveltejs/kit';
 
-/** @type {import('@sveltejs/kit').Config} */
-const config = {
+const config: Config = {
     preprocess: vitePreprocess(),
     kit: {
         adapter: adapter({
-			pages: 'build',
-			assets: 'build',
-			fallback: undefined,
-			precompress: false,
-			strict: false,
+            pages: 'build',
+            assets: 'build',
+            fallback: undefined,
+            precompress: false,
+            strict: false,
         }),
         prerender: {
             crawl: true,
