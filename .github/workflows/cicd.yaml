@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - switch-to-bun
   pull_request:
     branches:
       - main
