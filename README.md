@@ -14,7 +14,7 @@ CloudFlare is used for DNS.
 - `docker`
 - `cargo`
 - `sqlx-cli`
-- `npm`
+- `bun`
 
 ## How-to
 
@@ -29,7 +29,7 @@ CloudFlare is used for DNS.
 - Dev:
   - `docker compose up`
   - `cd backend ; bacon dev`
-  - `cd frontend ; npm run dev`
+  - `cd frontend ; bun --bun run dev`
   - After that, you can go to `http://localhost:8000` (a reverse-proxy is set up)
 - Create a new migration:
   - `cd backend`
