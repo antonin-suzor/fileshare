@@ -3,7 +3,7 @@ import { page } from '$app/state';
 import type { User } from '../types';
 import { axiosInstance } from './axios';
 
-const localStorageTokenKey = 'FILESHARE_AUTH_TOKEN'
+const localStorageTokenKey = 'FILESHARE_AUTH_TOKEN';
 
 let activeToken: string = $state('');
 let currentUser: User | undefined = $state();

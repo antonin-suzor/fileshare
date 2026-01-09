@@ -2,15 +2,19 @@
 ###### CLOUDFRONT ENDPOINT, PROXY, AND CACHING FOR THE APPLICATION
 ################################################################################
 
+########################################
+### PERMISSION SPECIFIERS
+########################################
+
 resource "aws_cloudfront_origin_access_control" "oac" {
-  name                              = "gena2-pl3-clf-oac"
+  name                              = "fileshare-clf-oac"
   description                       = "Access control for S3"
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
 
-data "aws_iam_policy_document" "origin_bucket_policy" {
+data "aws_iam_policy_document" "s3_frontend_get_object" {
   statement {
     sid    = "AllowCloudFrontServicePrincipalReadWrite"
     effect = "Allow"
@@ -36,9 +40,40 @@ data "aws_iam_policy_document" "origin_bucket_policy" {
   }
 }
 
-resource "aws_s3_bucket_policy" "b" {
+resource "aws_s3_bucket_policy" "s3_frontend_get_object" {
   bucket = aws_s3_bucket.frontend_bucket.bucket
-  policy = data.aws_iam_policy_document.origin_bucket_policy.json
+  policy = data.aws_iam_policy_document.s3_frontend_get_object.json
+}
+
+data "aws_iam_policy_document" "s3_usercontent_get_object" {
+  statement {
+    sid    = "AllowCloudFrontServicePrincipalReadWrite"
+    effect = "Allow"
+
+    principals {
+      type        = "Service"
+      identifiers = ["cloudfront.amazonaws.com"]
+    }
+
+    actions = [
+      "s3:GetObject",
+    ]
+
+    resources = [
+      "${aws_s3_bucket.usercontent_bucket.arn}/*",
+    ]
+
+    condition {
+      test     = "StringEquals"
+      variable = "AWS:SourceArn"
+      values   = [aws_cloudfront_distribution.clf_distrib.arn]
+    }
+  }
+}
+
+resource "aws_s3_bucket_policy" "s3_usercontent_get_object" {
+  bucket = aws_s3_bucket.usercontent_bucket.bucket
+  policy = data.aws_iam_policy_document.s3_usercontent_get_object.json
 }
 
 data "aws_cloudfront_origin_request_policy" "clf_apigw_origin_request_policy_nohost" {
@@ -49,12 +84,23 @@ data "aws_cloudfront_cache_policy" "clf_apigw_cache_policy_nocache" {
   name = "Managed-CachingDisabled"
 }
 
+########################################
+### CLOUDFRONT DISTRIBUTION
+########################################
+
 resource "aws_cloudfront_distribution" "clf_distrib" {
   enabled = true
 
   origin {
     domain_name = aws_s3_bucket.frontend_bucket.bucket_regional_domain_name
     origin_id   = "s3-frontend"
+
+    origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
+  }
+
+  origin {
+    domain_name = aws_s3_bucket.usercontent_bucket.bucket_domain_name
+    origin_id   = "s3-usercontent"
 
     origin_access_control_id = aws_cloudfront_origin_access_control.oac.id
   }
@@ -87,6 +133,14 @@ resource "aws_cloudfront_distribution" "clf_distrib" {
         forward = "none"
       }
     }
+  }
+
+  ordered_cache_behavior {
+    path_pattern           = "/content/*"
+    target_origin_id       = "s3-usercontent"
+    viewer_protocol_policy = "redirect-to-https"
+    allowed_methods        = ["GET", "HEAD"]
+    cached_methods         = ["GET", "HEAD"]
   }
 
   ordered_cache_behavior {

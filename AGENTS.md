@@ -95,10 +95,10 @@ Run the code: `bacon dev` (will start a dev server that will reload on file chan
 ### Frontend
 
 Sanity checks:
-- code compiles: `npm run check`
-- code is well-formatted: `npm run format` (running it will automatically format the code)
+- code compiles: `bun --bun run check`
+- code is well-formatted: `bun --bun run format` (running it will automatically format the code)
 
 There are no unit/integration tests in the frontend as of now.
 
-Run the code: `npm run dev` (will start a dev server that will reload on file change, there is a proxy for both backend/frontend on localhost:8000)
+Run the code: `bun --bun run dev` (will start a dev server that will reload on file change, there is a proxy for both backend/frontend on localhost:8000)
 

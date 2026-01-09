@@ -1,4 +1,5 @@
 <script lang="ts">
+    import { page } from '$app/state';
     import { axiosInstance } from '$lib/api/axios';
     import type { Upload } from '$lib/types';
 
@@ -19,7 +20,7 @@
 
     function copyLink() {
         navigator.clipboard
-            .writeText(upload.presigned_get)
+            .writeText(`${page.url.origin}/content/${upload.id}/${upload.file_name}`)
             .then(() => alert('Link copied successfully !'))
             .catch(() => alert('Hmm, something went wrong... Did you give us access to your clipboard ?'));
     }
@@ -47,7 +48,12 @@
     <div class="card-body border-t">
         <h2 class="card-title link"><a href={`/uploads/view?id=${upload.id}`}>{upload.file_name}</a></h2>
         <div class="card-actions justify-end">
-            <a href={upload.presigned_get} target="_blank" class="btn btn-primary">Download</a>
+            <a
+                href={`/content/${upload.id}/${upload.file_name}`}
+                target="_blank"
+                class="btn btn-primary"
+                download={upload.file_name}>Download</a
+            >
             <button class="btn btn-primary" onclick={copyLink}>Copy Link</button>
             <button class="btn btn-primary" onclick={deleteUpload}>Delete</button>
         </div>
