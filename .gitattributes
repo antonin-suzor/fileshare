@@ -1,0 +1,20 @@
+# Auto-normalize text files and enforce LF for source files
+* text=auto
+*.md text eol=lf
+*.txt text eol=lf
+
+*.sql text eol=lf
+*.rs text eol=lf
+
+*.js text eol=lf
+*.ts text eol=lf
+*.svelte text eol=lf
+*.html text eol=lf
+*.css text eol=lf
+
+*.toml text eol=lf
+*.json text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+
+*.tf text eol=lf

@@ -1,0 +1,31 @@
+[package]
+name = "fileshare-backend"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+anyhow = "1.0.100"
+axum = "0.8"
+axum-macros = "0.5.0"
+aws-sdk-s3 = { version = "1.118.0", features = ["behavior-version-latest"] }
+aws-config = { version = "1.1.7", features = ["behavior-version-latest"] }
+bcrypt = "0.14"
+chrono = { version = "0.4.42", features = ["serde"] }
+dotenvy = "0.15"
+env_logger = "0.11"
+jsonwebtoken = "8"
+lambda_http = "0.13.0"
+lettre = { version = "0.11", features = ["builder"] }
+reqwest = { version = "0.12", features = ["json"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+sqlx = { version = "0.8", features = ["chrono", "macros", "migrate", "postgres", "runtime-tokio", "tls-rustls-aws-lc-rs", "uuid"] }
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.145"
+uuid = { version = "1.19.0", features = ["serde", "v4"] }
+
+[target.'cfg(unix)'.dependencies]
+openssl = { version = "0.10", features = ["vendored"] }
+
+[profile.release]
+panic = "unwind"
+debug = true
