@@ -1,19 +1,22 @@
-/*
-DO NOT RENAME TO TS, OR CLOUDFLARE PAGES WILL CRASH ON BUILD
-*/
+// NEVER RENAME SVELTE CONFIG TO TS, OR AT SOME POINT SOME BUILD WILL CRASH
+
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
 
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     preprocess: vitePreprocess(),
+    compilerOptions: {
+        warningFilter: (warning) =>
+            !warning.filename?.includes('node_modules') && !warning.code.startsWith('a11y_media_has_caption'),
+    },
     kit: {
         adapter: adapter({
-			pages: 'build',
-			assets: 'build',
-			fallback: undefined,
-			precompress: false,
-			strict: false,
+            pages: 'build',
+            assets: 'build',
+            fallback: undefined,
+            precompress: false,
+            strict: false,
         }),
         prerender: {
             crawl: true,

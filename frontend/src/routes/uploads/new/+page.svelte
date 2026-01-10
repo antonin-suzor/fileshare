@@ -1,19 +1,13 @@
 <script lang="ts">
     import { goto } from '$app/navigation';
-    import { axiosInstance } from '$lib/api/axios';
+    import { startNewUpload } from '$lib/api/uploads.svelte';
 
     let files: FileList | null = $state(null);
 
     async function uploadFiles() {
         const file: File = files?.item(0)!;
-        console.log(file);
-        let res = await axiosInstance.post('/api/uploads/start', {
-            file_name: file.name,
-            content_type: file.type,
-            expires_at: new Date(Date.now() + 1000 * 60 * 60 * 24),
-        });
-        console.log(res.status, res.data);
-        const response = await fetch(res.data.url, {
+        const presigned_put_url = await startNewUpload(file.name, file.type);
+        await fetch(presigned_put_url, {
             method: 'PUT',
             body: file,
             headers: {
