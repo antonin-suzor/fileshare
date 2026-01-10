@@ -45,7 +45,7 @@ impl UserController {
         State(db_pool): State<PgPool>,
         Json(request): Json<SignUpRequest>,
     ) -> Result<Json<SignUpResponse>, ApiMessage> {
-        let user_db = UserService::signup(&db_pool, request.email, request.password)
+        let user_db = UserService::signup(&db_pool, &request.email, &request.password)
             .await
             .with_context(|| "Failed to signup user")
             .map_err(context_to_500)?;

@@ -1,4 +1,4 @@
-use fileshare_backend::{app_router, get_db_url, migrate};
+use fileshare_backend::{app_router, migrate};
 use sqlx::PgPool;
 use std::env;
 use tokio::net::TcpListener;
@@ -11,7 +11,7 @@ async fn main() -> anyhow::Result<()> {
     let axum_port =
         env::var("AXUM_PORT").map_or(3000, |e| e.parse().expect("AXUM_PORT should be a number"));
 
-    let db_pool = PgPool::connect(&get_db_url())
+    let db_pool = PgPool::connect(&env::var("DATABASE_URL")?)
         .await
         .expect("Connection to database should not fail");
 
