@@ -1,6 +1,7 @@
-use fileshare_backend::{app_router, get_db_url, migrate};
+use fileshare_backend::{app_router, migrate};
 use lambda_http::{Error, run, tracing};
 use sqlx::PgPool;
+use std::env;
 
 #[tokio::main]
 async fn main() -> Result<(), Error> {
@@ -8,7 +9,7 @@ async fn main() -> Result<(), Error> {
     let _ = dotenvy::dotenv();
     env_logger::init(); // useless for now
 
-    let db_pool = PgPool::connect(&get_db_url())
+    let db_pool = PgPool::connect(&env::var("DATABASE_URL")?)
         .await
         .expect("Connection to database should not fail");
 
