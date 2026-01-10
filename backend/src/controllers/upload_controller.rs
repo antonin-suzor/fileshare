@@ -17,7 +17,7 @@ use uuid::Uuid;
 /// Controller for /api/uploads
 pub struct UploadController {}
 impl UploadController {
-    // GET /api/uploads
+    /// GET /api/uploads
     pub async fn get_api_uploads(
         State(db_pool): State<PgPool>,
     ) -> Result<Json<Vec<UploadResponse>>, ApiMessage> {
@@ -28,7 +28,7 @@ impl UploadController {
         Ok(Json(uploads.iter().map(|u| u.into()).collect()))
     }
 
-    // GET /api/uploads/{id}
+    /// GET /api/uploads/{id}
     pub async fn get_api_uploads_id(
         State(db_pool): State<PgPool>,
         headers: HeaderMap,
@@ -61,7 +61,7 @@ impl UploadController {
         }
     }
 
-    // GET /api/uploads/mine
+    /// GET /api/uploads/mine
     pub async fn get_api_uploads_mine(
         State(db_pool): State<PgPool>,
         headers: HeaderMap,
@@ -74,13 +74,16 @@ impl UploadController {
         Ok(Json(uploads.iter().map(|u| u.into()).collect()))
     }
 
-    // POST /api/uploads/start
+    /// POST /api/uploads/start
     pub async fn post_api_uploads_start(
         State(db_pool): State<PgPool>,
         headers: HeaderMap,
         Json(request): Json<UploadStartRequest>,
     ) -> Result<Json<UploadStartResponse>, ApiMessage> {
         let user = AuthService::get_user_from_auth_header(&db_pool, &headers).await?;
+        if !user.is_verified() {
+            return Err(ApiMessage::from(StatusCode::FORBIDDEN));
+        }
         let presigned_put_response = UploadService::register_new_upload_and_generate_presigned_put(
             &db_pool,
             user,

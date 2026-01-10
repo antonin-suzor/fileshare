@@ -21,10 +21,10 @@ impl UserService {
         UserRepository::from_email(db_pool, email).await
     }
 
-    pub async fn signup(db_pool: &PgPool, email: String, password: String) -> anyhow::Result<User> {
+    pub async fn signup(db_pool: &PgPool, email: &str, password: &str) -> anyhow::Result<User> {
         let user = UserRepository::create(
             db_pool,
-            &email,
+            email,
             &bcrypt::hash(password, bcrypt::DEFAULT_COST)
                 .with_context(|| "Failed to hash password")?,
         )

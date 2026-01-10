@@ -5,6 +5,9 @@ use sqlx::PgPool;
 use sqlx::migrate::Migrator;
 use std::{env, path::Path};
 
+#[cfg(test)]
+mod api_tests;
+
 pub mod controllers;
 pub mod dtos;
 pub mod entities;
