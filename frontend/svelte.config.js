@@ -1,8 +1,10 @@
+// NEVER RENAME SVELTE CONFIG TO TS, OR AT SOME POINT SOME BUILD WILL CRASH
+
 import adapter from '@sveltejs/adapter-static';
 import { vitePreprocess } from '@sveltejs/vite-plugin-svelte';
-import { Config } from '@sveltejs/kit';
 
-const config: Config = {
+/** @type {import('@sveltejs/kit').Config} */
+const config = {
     preprocess: vitePreprocess(),
     compilerOptions: {
         warningFilter: (warning) =>
