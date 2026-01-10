@@ -45,6 +45,16 @@
             {:then uploadText}
                 <code>{uploadText}</code>
             {/await}
+        {:else if upload.content_type.startsWith('audio')}
+            <audio controls preload="metadata" src={`/content/${upload.id}/${upload.file_name}`}></audio>
+        {:else if upload.content_type.startsWith('video')}
+            <video
+                controls
+                preload="metadata"
+                src={`/content/${upload.id}/${upload.file_name}`}
+                playsinline
+                style="object-fit: scale-down;"
+            ></video>
         {:else}
             <p>No preview available.</p>
         {/if}

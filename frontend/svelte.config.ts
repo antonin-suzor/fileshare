@@ -4,6 +4,10 @@ import { Config } from '@sveltejs/kit';
 
 const config: Config = {
     preprocess: vitePreprocess(),
+    compilerOptions: {
+        warningFilter: (warning) =>
+            !warning.filename?.includes('node_modules') && !warning.code.startsWith('a11y_media_has_caption'),
+    },
     kit: {
         adapter: adapter({
             pages: 'build',
