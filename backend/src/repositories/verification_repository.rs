@@ -1,4 +1,4 @@
-use crate::entities::Verification;
+use crate::{entities::Verification, repositories::ReturningId};
 use chrono::Utc;
 use sqlx::{Error as SqlxError, PgPool};
 use uuid::Uuid;
@@ -54,12 +54,21 @@ impl VerificationRepository {
     }
 
     pub async fn delete_from_id(db_pool: &PgPool, id: &Uuid) -> Result<(), SqlxError> {
-        let now = Utc::now().fixed_offset();
-        sqlx::query("UPDATE verifications SET deleted_at = $1 WHERE id = $2 RETURNING id;")
-            .bind(now)
+        sqlx::query("DELETE FROM verifications WHERE id = $1 RETURNING id;")
             .bind(id)
             .fetch_one(db_pool)
             .await?;
         Ok(())
+    }
+
+    pub async fn delete_unused_of_user_id(
+        db_pool: &PgPool,
+        user_id: &Uuid,
+    ) -> Result<Vec<Uuid>, SqlxError> {
+        Ok(sqlx::query_as::<_, ReturningId>("DELETE FROM verifications WHERE user_id = $1 AND id != (SELECT verified_with_id FROM users WHERE id = $1) RETURNING id;")
+            .bind(user_id)
+            .fetch_all(db_pool)
+            .await?
+            .iter().map(move|returning_id| returning_id.id).collect())
     }
 }

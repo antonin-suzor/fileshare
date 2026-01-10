@@ -92,6 +92,7 @@ impl AuthService {
                     UserRepository::set_user_verification(db_pool, &user_id, &verification_id)
                         .await?
                         .ok_or_else(|| anyhow::anyhow!("User not found"))?;
+                VerificationRepository::delete_unused_of_user_id(db_pool, &user_id).await?;
 
                 // Notify Discord of email verification
                 let _ = DiscordService::notify_email_verified(&user.email).await;

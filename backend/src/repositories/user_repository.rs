@@ -82,26 +82,63 @@ impl UserRepository {
 
 #[cfg(test)]
 mod tests {
+    use crate::repositories::{ReturningCount, ReturningId};
+
     use super::*;
 
     #[sqlx::test]
-    async fn from_email_contains_correct(pool: PgPool) -> anyhow::Result<()> {
+    async fn from_email_contains_correct(db_pool: PgPool) -> anyhow::Result<()> {
         sqlx::query("INSERT INTO users (email, password_hash) values ('correct', 'hash');")
-            .execute(&pool)
+            .execute(&db_pool)
             .await?;
-        let from_email = UserRepository::from_email(&pool, "correct").await?;
+
+        let from_email = UserRepository::from_email(&db_pool, "correct").await?;
         assert!(from_email.is_some());
         assert_eq!(from_email.unwrap().email, "correct");
+
         Ok(())
     }
 
     #[sqlx::test]
-    async fn from_email_does_not_contain_incorrect(pool: PgPool) -> anyhow::Result<()> {
+    async fn from_email_does_not_contain_incorrect(db_pool: PgPool) -> anyhow::Result<()> {
         sqlx::query("INSERT INTO users (email, password_hash) values ('incorrect', 'hash');")
-            .execute(&pool)
+            .execute(&db_pool)
             .await?;
-        let from_email = UserRepository::from_email(&pool, "correct").await?;
+
+        let from_email = UserRepository::from_email(&db_pool, "correct").await?;
         assert!(from_email.is_none());
+
+        Ok(())
+    }
+
+    #[sqlx::test]
+    async fn delete_user_also_deletes_verifications(db_pool: PgPool) -> anyhow::Result<()> {
+        let user_id: Uuid = sqlx::query_as::<_, ReturningId>(
+            "INSERT INTO users (email, password_hash) values ('correct', 'hash') RETURNING id;",
+        )
+        .fetch_one(&db_pool)
+        .await?
+        .id;
+
+        sqlx::query("INSERT INTO verifications (user_id) values ($1), ($1);")
+            .bind(&user_id)
+            .execute(&db_pool)
+            .await?;
+        let count_before: i64 =
+            sqlx::query_as::<_, ReturningCount>("SELECT COUNT(*) AS count FROM verifications;")
+                .fetch_one(&db_pool)
+                .await?
+                .count;
+        assert_eq!(count_before, 2);
+
+        UserRepository::delete_from_id(&db_pool, &user_id).await?;
+        let count_after: i64 =
+            sqlx::query_as::<_, ReturningCount>("SELECT COUNT(*) AS count FROM verifications;")
+                .fetch_one(&db_pool)
+                .await?
+                .count;
+        assert_eq!(count_after, 0);
+
         Ok(())
     }
 }
