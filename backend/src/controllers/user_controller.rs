@@ -104,6 +104,14 @@ impl UserController {
         headers: HeaderMap,
     ) -> Result<(), ApiMessage> {
         let user = AuthService::get_user_from_auth_header(&db_pool, &headers).await?;
+        if user.is_verified() {
+            return Err(ApiMessage {
+                status: StatusCode::CONFLICT,
+                message: String::from(
+                    "User is already verified, refusing to send verification email",
+                ),
+            });
+        }
         UserService::start_email_verification_process(&db_pool, &user)
             .await
             .with_context(|| "Failed to send verification email")
