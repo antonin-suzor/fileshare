@@ -3,7 +3,7 @@
 [![CI](https://github.com/antonin-suzor/fileshare/actions/workflows/cicd.yaml/badge.svg?branch=main)](https://github.com/antonin-suzor/fileshare/actions/workflows/cicd.yaml)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE.txt)
 
-My website for file sharing: https://fileshare.antonin-suzor.com
+My website for file sharing: `https://fileshare.antonin-suzor.com` (currently taken down to avoid costs)
 
 Uses Postgres+S3 for data storage, Rust+Axum+SQLX for the backend, TS+SvelteKit+TailwindCSS+DaisyUI for the frontend.
 Deployed with Terraform on AWS with RDS, S3, Lambda, ApiGateway, CloudFront.

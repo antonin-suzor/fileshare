@@ -117,7 +117,8 @@ jobs:
           terraform fmt -check -no-color
 
   build-app:
-    if: github.ref == 'refs/heads/main'
+    if : false
+    # if: github.ref == 'refs/heads/main'
     needs:
       - test-frontend
       - test-backend
@@ -201,7 +202,8 @@ jobs:
             backend/target
 
   deploy-app:
-    if: github.ref == 'refs/heads/main'
+    if : false
+    # if: github.ref == 'refs/heads/main'
     needs:
       - build-app
     concurrency:
