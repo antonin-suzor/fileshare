@@ -20,17 +20,6 @@ use uuid::Uuid;
 /// Controller for /api/users
 pub struct UserController {}
 impl UserController {
-    /// GET /api/users
-    pub async fn get_api_users(
-        State(db_pool): State<PgPool>,
-    ) -> Result<Json<Vec<UserResponse>>, ApiMessage> {
-        let users = UserService::list(&db_pool)
-            .await
-            .with_context(|| "Failed to list users")
-            .map_err(context_to_500)?;
-        Ok(Json(users.iter().map(|u| u.into()).collect()))
-    }
-
     /// GET /api/users/me
     pub async fn get_api_users_me(
         State(db_pool): State<PgPool>,
@@ -156,7 +145,6 @@ impl UserController {
     /// Router to nest in /api/users
     pub fn router() -> Router<PgPool> {
         Router::new()
-            .route("/", get(Self::get_api_users))
             .route("/login", post(Self::post_api_users_login))
             .route(
                 "/me",
