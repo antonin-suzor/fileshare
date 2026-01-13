@@ -2,19 +2,16 @@
     import { page } from '$app/state';
     import { onMount } from 'svelte';
 
-    import { login, sendVerification, signup, verify } from '$lib/api/auth.svelte';
+    import { isVerified, sendVerification, verify } from '$lib/api/auth.svelte';
     import { goto } from '$app/navigation';
 
-    let email: string = $state('');
     let id: string = $state('');
-
-    function redirect(ifNotSpecifiedThenGoTo: string = '') {
-        goto(page.url.searchParams.get('redirect') ?? ifNotSpecifiedThenGoTo);
-    }
 
     async function handleNeedVerified() {
         if (await sendVerification()) {
             alert('Email sent! Please check your email to verify your account.');
+        } else {
+            alert('Hmm, something went wrong... Please try again later.');
         }
     }
 
@@ -22,11 +19,11 @@
         id = page.url.searchParams.get('id') ?? '';
         if (id !== '') {
             if (await verify(id)) {
-                alert('Your account has been verified successfully!');
-                redirect('/uploads');
+                alert("Your account's email has been verified successfully!");
+                goto(page.url.searchParams.get('redirect') ?? '/uploads');
             } else {
                 alert(
-                    'Failed to verify your account. Please try again later or verify that you copied the URL correctly.'
+                    'Hmm, something went wrong... Please try again later or verify that you copied the URL correctly.'
                 );
             }
         }
@@ -37,16 +34,19 @@
     <title>Email Verification | FileShare</title>
 </svelte:head>
 
-{#if id === ''}
-    <div class="flex justify-center-safe">Please enter your email to receive a new verification email.</div>
+{#if isVerified()}
+    <div class="flex justify-center-safe">All is well ! It looks like your account's email is already verified.</div>
+{:else if id === ''}
     <div class="flex justify-center-safe">
-        <input type="text" placeholder="Email" class="input" bind:value={email} />
-        <button class="btn" onclick={handleNeedVerified}>Receive verification email</button>
+        <button class="btn btn-wide" onclick={handleNeedVerified}>Receive verification email</button>
     </div>
     <div class="flex justify-center-safe">
-        Once you have verified your account, to return to your content (if any), you can click here.
-    </div>
-    <div class="flex justify-center-safe">
-        <button class="btn" onclick={() => redirect}>Return where you left off</button>
+        <button
+            class="btn btn-wide"
+            onclick={() =>
+                page.url.searchParams.get('redirect') !== null
+                    ? goto(page.url.searchParams.get('redirect') as string)
+                    : history.back()}>Return where you left off</button
+        >
     </div>
 {/if}

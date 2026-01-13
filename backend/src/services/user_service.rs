@@ -42,6 +42,12 @@ impl UserService {
         db_pool: &PgPool,
         user: &User,
     ) -> anyhow::Result<()> {
+        if user.is_verified() {
+            return Err(anyhow::anyhow!(
+                "User is already verified, refusing to start verification process"
+            ));
+        }
+
         let verification = VerificationRepository::insert(db_pool, &user.id).await?;
 
         // Send verification email

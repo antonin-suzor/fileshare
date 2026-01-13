@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { isLoggedIn } from '$lib/api/auth.svelte';
+    import { isLoggedIn, isVerified } from '$lib/api/auth.svelte';
 </script>
 
 <svelte:head>
@@ -20,4 +20,9 @@
 {#if isLoggedIn()}
     <div class="flex justify-center-safe"><a href="/account/manage" class="btn btn-wide">Manage Account</a></div>
     <div class="flex justify-center-safe"><a href="/account/logout" class="btn btn-wide">Log Out</a></div>
+    {#if !isVerified()}
+        <div class="flex justify-center-safe">
+            <a href="/account/logout" class="btn btn-wide">Verify you account email</a>
+        </div>
+    {/if}
 {/if}
