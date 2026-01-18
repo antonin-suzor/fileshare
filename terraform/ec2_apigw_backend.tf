@@ -63,6 +63,7 @@ resource "aws_apigatewayv2_integration" "lambda_integration" {
   api_id                 = aws_apigatewayv2_api.http_api.id
   integration_type       = "HTTP_PROXY"
   integration_uri        = "http://${aws_instance.backend.public_ip}"
+  integration_method     = "ANY"
   connection_type        = "INTERNET"
   payload_format_version = "1.0"
 }
