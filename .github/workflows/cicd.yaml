@@ -262,4 +262,4 @@ jobs:
           rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/certs/ "ubuntu@$EC2_IP":/opt/fileshare/backend/certs/
           rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/migrations/ "ubuntu@$EC2_IP":/opt/fileshare/backend/migrations/
           
-          ssh -i ~/.ssh/4eeee.pem "ubuntu@$EC2_IP" 'pkill -f "/opt/fileshare/backend/webserver"; sleep 1; nohup /opt/fileshare/backend/webserver > /opt/fileshare/backend/backend.log 2>&1 &'
+          ssh -i ~/.ssh/4eeee.pem "ubuntu@$EC2_IP" 'chmod +x /opt/fileshare/backend/webserver ; pkill -f "/opt/fileshare/backend/webserver"; nohup /opt/fileshare/backend/webserver > /opt/fileshare/backend/backend.log 2>&1 &'
