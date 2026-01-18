@@ -2,9 +2,9 @@
 set -eux
 
 mkdir --parents /opt/fileshare/backend /opt/fileshare/backend/certs /opt/fileshare/backend/migrations
-cd /opt/fileshare/backend
+chown -R ubuntu: /opt/fileshare
 
-echo >> .env << 'EOF'
+cat >> /opt/fileshare/backend/.env << EOF
 RUST_BACKTRACE=1
 RUST_LOG=debug
 AXUM_PORT=80
