@@ -4,7 +4,7 @@
 
 resource "aws_db_subnet_group" "dbsubnet" {
   name       = "pae-db-subnet-group"
-  subnet_ids = [aws_subnet.private_1.id, aws_subnet.private_2.id]
+  subnet_ids = data.aws_subnets.default.ids
   tags       = { Name = "fileshare-db-subnet-group" }
 }
 

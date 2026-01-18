@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - switch-backend-to-ec2
   pull_request:
     branches:
       - main
@@ -117,7 +118,6 @@ jobs:
           terraform fmt -check -no-color
 
   build-app:
-    if : false
     # if: github.ref == 'refs/heads/main'
     needs:
       - test-frontend
@@ -160,24 +160,15 @@ jobs:
             ${{ runner.os }}-cargo-build
             ${{ runner.os }}-cargo
 
-      - name: Install cargo lambda
-        run: |
-          if ! cargo lambda --version
-          then
-              cargo install cargo-lambda
-              echo "cargo lambda is situated at : " $(which cargo-lambda)
-          fi
-
       - name: Setup backend env file
         working-directory: backend
         run: |
           cp .env.example .env
 
-      - name: Build api lambda
+      - name: Build backend
         working-directory: backend
         run: |
-          npm install -g @ziglang/cli
-          cargo lambda build --bin apilambda --target aarch64-unknown-linux-gnu --release --lambda-dir ./cargo_lambda_build_result --flatten apilambda --output-format zip --include certs --include migrations
+          cargo build --release --bin webserver
 
       - name: Upload build-app artifacts
         uses: actions/upload-artifact@v4
@@ -185,7 +176,9 @@ jobs:
           name: build-app-files
           path: |
             frontend/build/
-            backend/cargo_lambda_build_result/bootstrap.zip
+            backend/target/release/webserver
+            backend/certs/
+            backend/migrations/
           retention-days: 1
           overwrite: true
           include-hidden-files: true
@@ -202,7 +195,6 @@ jobs:
             backend/target
 
   deploy-app:
-    if : false
     # if: github.ref == 'refs/heads/main'
     needs:
       - build-app
@@ -252,3 +244,21 @@ jobs:
           TF_VAR_discord_webhook_url: ${{ secrets.DISCORD_WEBHOOK_URL }}
         run: |
           terraform apply -input=false -no-color -auto-approve
+
+      - name: Deploy backend to EC2
+        env:
+          SSH_KEY: ${{ secrets.EC2_SSH_KEY_4EEEE }}
+        run: |
+          cd terraform
+          EC2_IP=$(terraform output -raw ec2_public_ip 2>/dev/null)
+          cd ..
+
+          mkdir ~/.ssh
+          echo "$SSH_KEY" > ~/.ssh/4eeee.pem
+          ssh-keyscan -H "$EC2_IP" >> ~/.ssh/known_hosts 2>/dev/null
+          
+          rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/target/release/webserver "ubuntu@$EC2_IP":/opt/fileshare/backend/webserver
+          rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/certs/ "ubuntu@$EC2_IP":/opt/fileshare/backend/certs/
+          rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/migrations/ "ubuntu@$EC2_IP":/opt/fileshare/backend/migrations/
+          
+          ssh -i ~/.ssh/4eeee.pem "ubuntu@$EC2_IP" 'pkill -f "/opt/fileshare/backend/webserver"; sleep 1; nohup /opt/fileshare/backend/webserver > /opt/fileshare/backend/backend.log 2>&1 &'

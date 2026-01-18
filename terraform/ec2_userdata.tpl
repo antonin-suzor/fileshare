@@ -1,0 +1,28 @@
+#!/bin/bash
+set -eux
+
+mkdir --parents /opt/fileshare/backend /opt/fileshare/backend/certs /opt/fileshare/backend/migrations
+cd /opt/fileshare/backend
+
+echo >> .env << 'EOF'
+RUST_BACKTRACE=1
+RUST_LOG=debug
+AXUM_PORT=80
+JWT_SECRET=${JWT_SECRET}
+WEB_HOST=${WEB_HOST}
+
+DATABASE_URL=${DATABASE_URL}
+
+S3_URL=${S3_URL}
+S3_ACCESS_KEY_ID=${S3_ACCESS_KEY_ID}
+S3_SECRET_ACCESS_KEY=${S3_SECRET_ACCESS_KEY}
+S3_REGION=${S3_REGION}
+S3_PATH_STYLE_BUCKETS=${S3_PATH_STYLE_BUCKETS}
+S3_BUCKET_NAME=${S3_BUCKET_NAME}
+
+MAIL_USER=${MAIL_USER}
+MAIL_PASSWORD=${MAIL_PASSWORD}
+MAIL_FROM=${MAIL_FROM}
+
+DISCORD_WEBHOOK_URL=${DISCORD_WEBHOOK_URL}
+EOF

@@ -11,3 +11,8 @@ output "domain_name" {
   description = "Public-facing URL-host of the website"
   value       = "${var.custom_subdomain}.${var.cloudflare_zone_name}"
 }
+
+output "ec2_public_ip" {
+  description = "Public IP of EC2 instance"
+  value       = aws_instance.backend.public_ip
+}

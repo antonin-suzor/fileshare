@@ -12,12 +12,6 @@ variable "path_to_frontend_files" {
   default     = "../frontend/build"
 }
 
-variable "path_to_backend_zip" {
-  description = "Path to the zip file containing the lambda function"
-  type        = string
-  default     = "../backend/cargo_lambda_build_result/bootstrap.zip"
-}
-
 ########################################
 ### AWS SETTINGS
 ########################################
@@ -29,7 +23,7 @@ variable "s3_frontend_bucket_name" {
 }
 
 variable "s3_usercontent_bucket_name" {
-  description = "Name of the s3 bucket fro the user-uploaded content (must be unique across AWS)"
+  description = "Name of the s3 bucket for the user-uploaded content (must be unique across AWS)"
   type        = string
   default     = "fileshare-asuzor-usercontent"
 }
