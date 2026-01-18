@@ -24,7 +24,7 @@ resource "aws_instance" "backend" {
     Name = "fileshare-backend"
   }
 
-  user_data = base64encode(templatefile("${path.module}/ec2_userdata.tpl", {
+  user_data = templatefile("${path.module}/ec2_userdata.tpl", {
     JWT_SECRET = var.jwt_secret
     WEB_HOST   = "https://${var.custom_subdomain}.${var.cloudflare_zone_name}"
 
@@ -42,7 +42,7 @@ resource "aws_instance" "backend" {
     MAIL_FROM     = var.mail_from
 
     DISCORD_WEBHOOK_URL = var.discord_webhook_url
-  }))
+  })
 }
 
 ########################################
