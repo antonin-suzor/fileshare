@@ -255,6 +255,7 @@ jobs:
 
           mkdir ~/.ssh
           echo "$SSH_KEY" > ~/.ssh/4eeee.pem
+          chmod 600 ~/.ssh/4eeee.pem
           ssh-keyscan -H "$EC2_IP" >> ~/.ssh/known_hosts 2>/dev/null
           
           rsync -avz --delete -e "ssh -i ~/.ssh/4eeee.pem" backend/target/release/webserver "ubuntu@$EC2_IP":/opt/fileshare/backend/webserver
