@@ -23,7 +23,7 @@ resource "aws_instance" "backend" {
     Name = "fileshare-backend"
   }
 
-  user_data = templatefile("${path.module}/ec2_userdata.tpl", {
+  user_data = templatefile("${path.module}/ec2_userdata.tftpl", {
     JWT_SECRET = var.jwt_secret
     WEB_HOST   = "https://${var.custom_subdomain}.${var.cloudflare_zone_name}"
 
