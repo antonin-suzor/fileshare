@@ -10,7 +10,6 @@ resource "aws_instance" "backend" {
   ami                    = "ami-0fa91bc90632c73c9" # Ubuntu Server 24.04
   instance_type          = "t3.micro"
   vpc_security_group_ids = [aws_security_group.ec2_sg.id]
-  subnet_id              = data.aws_subnets.default.id
   key_name               = "4eeee"
 
   root_block_device {
