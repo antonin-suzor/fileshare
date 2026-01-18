@@ -17,7 +17,7 @@ resource "aws_security_group" "rds_sg" {
   name   = "fileshare-rds-sg"
   vpc_id = data.aws_vpc.default.id
 
-  description = "Security group for RDS - only allow Lambda SG to connect"
+  description = "Security group for RDS - only allow EC2 SG to connect"
 
   lifecycle {
     create_before_destroy = true
@@ -63,7 +63,7 @@ resource "aws_security_group_rule" "ec2_allow_ssh_from_all" {
   from_port         = 22
   to_port           = 22
   protocol          = "tcp"
-  security_group_id = aws_security_group.rds_sg.id
+  security_group_id = aws_security_group.ec2_sg.id
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
 }
@@ -73,7 +73,7 @@ resource "aws_security_group_rule" "ec2_allow_http_from_all" {
   from_port         = 80
   to_port           = 80
   protocol          = "tcp"
-  security_group_id = aws_security_group.rds_sg.id
+  security_group_id = aws_security_group.ec2_sg.id
   cidr_blocks       = ["0.0.0.0/0"]
   ipv6_cidr_blocks  = ["::/0"]
 }
